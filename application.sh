@@ -12,14 +12,28 @@ DoAction() {
     # Turn off echo
     tput sc
     # Save cursor position
-    echo -ne "\033[0K\r"
-    # Clear the current line
-    echo -e "\033[48;5;57m[$(printf "%05d" $count)]\033[0m Enter your $1: $Keys"
-    # Echo currently typed text with elapsed time
+    if [[ "$2" == "valid" ]]; then
+        echo -ne "\033[0K\r"
+        echo -e "\033[48;5;57m[$(printf "%05d" $count)]\033[0m Enter your $1: \033[32m$Keys\033[0m"
+    else
+        echo -ne "\033[0K\r"
+        echo -e "\033[48;5;57m[$(printf "%05d" $count)]\033[0m Enter your $1: \033[31m$Keys\033[0m"
+    fi
+    # Clear the current line and echo currently typed text with the specified color
     stty echo
     # Turn echo on
     tput rc
     # Return cursor
+}
+
+validate_email() {
+    local email="$1"
+    # Simple regex for basic email validation
+    if [[ "$email" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 main() {
@@ -42,7 +56,7 @@ main() {
     echo
     echo "Welcome to cnz1 questions!"
     echo
-    echo "Let's get going!"
+    echo "Let's get going! Please enter your details to apply."
 
     # Array of prompts
     prompts=(
@@ -74,6 +88,8 @@ main() {
         count=0
         clock=0
         Keys=""
+        valid=false
+
         echo -ne "\033[48;5;57m[00000]\033[0m Enter your $prompt: "
         while Keys=$Keys$keypress; do
             sleep 0.05
@@ -82,9 +98,40 @@ main() {
             if [[ clock -eq 20 ]]; then
                 ((count++))
                 clock=0
-                DoAction "$prompt" $Keys
+                if [[ "$prompt" == "E-mail" ]]; then
+                    if validate_email "$Keys"; then
+                        DoAction "$prompt" "valid"
+                    else
+                        DoAction "$prompt" "invalid"
+                    fi
+                else
+                    DoAction "$prompt" "valid"
+                fi
             fi
         done
+
+        # Email validation
+        if [[ "$prompt" == "E-mail" ]]; then
+            while ! validate_email "$Keys"; do
+                Keys=""
+                echo -ne "\033[48;5;57m[00000]\033[0m Enter your $prompt: "
+                while Keys=$Keys$keypress; do
+                    sleep 0.05
+                    read keypress && break
+                    ((clock = clock + 1))
+                    if [[ clock -eq 20 ]]; then
+                        ((count++))
+                        clock=0
+                        if validate_email "$Keys"; then
+                            DoAction "$prompt" "valid"
+                        else
+                            DoAction "$prompt" "invalid"
+                        fi
+                    fi
+                done
+            done
+        fi
+
         echo "[$(printf "%05d" $count)] $prompt: $Keys" >> "$responses_file"
     done
     echo >> "$responses_file"
