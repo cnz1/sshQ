@@ -42,7 +42,7 @@ main() {
     echo
     echo "Welcome to cnz1 questions!"
     echo
-    echo "Let's get going! Please enter your details to apply."
+    echo "Let's get going!"
 
     # Array of prompts
     prompts=(
@@ -65,6 +65,11 @@ main() {
         "Found out about the SSH server via"
     )
 
+    # Create or clear the responses file in /tmp
+    responses_file="/tmp/responses.txt"
+    timestamp=$(date "+%Y-%m-%d %H:%M:%S")
+    echo "Responses recorded at $timestamp:" >> "$responses_file"
+
     for prompt in "${prompts[@]}"; do
         count=0
         clock=0
@@ -79,11 +84,13 @@ main() {
                 clock=0
                 DoAction "$prompt" $Keys
             fi
-        done        
+        done
+        echo "[$(printf "%05d" $count)] $prompt: $Keys" >> "$responses_file"
     done
+    echo >> "$responses_file"
 
     stty sane
-    echo "Thanks for using this script."
+    echo "Thanks for using this script. Your responses have been saved to $responses_file."
     exit 0
 }
 
