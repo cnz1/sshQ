@@ -27,13 +27,43 @@ main() {
     stty -icanon time 0 min 0 -echo
     # Turn off echo and set read time to nothing
     keypress=''
-
+    
+    echo " .----------------.  .-----------------. .----------------.  .----------------. "
+    echo "| .--------------. || .--------------. || .--------------. || .--------------. |"
+    echo "| |     ______   | || | ____  _____  | || |   ________   | || |     __       | |"
+    echo "| |   .' ___  |  | || ||_   \|_   _| | || |  |  __   _|  | || |    /  |      | |"
+    echo "| |  / .'   \_|  | || |  |   \ | |   | || |  |_/  / /    | || |    \`| |      | |"
+    echo "| |  | |         | || |  | |\ \| |   | || |     .'.' _   | || |     | |      | |"
+    echo "| |  \ \`.___.'\  | || | _| |_\   |_  | || |   _/ /__/ |  | || |    _| |_     | |"
+    echo "| |   \`._____.'  | || ||_____|\____| | || |  |________|  | || |   |_____|    | |"
+    echo "| |              | || |              | || |              | || |              | |"
+    echo "| '--------------' || '--------------' || '--------------' || '--------------' |"
+    echo " '----------------'  '----------------'  '----------------'  '----------------' "
+    echo
     echo "Welcome to cnz1 questions!"
     echo
     echo "Let's get going! Please enter your details to apply."
 
     # Array of prompts
-    prompts=("E-mail" "Full Name" "Address")
+    prompts=(
+        "E-mail"
+        "Full Name"
+        "Address"
+        "GitHub profile URL"
+        "Favourite editor/IDE"
+        "Favourite programming languages"
+        "Favourite shell"
+        "Favourite database server"
+        "Favourite web server"
+        "Favourite command-line tool"
+        "Preferred developer role(s)"
+        "First line of code and language"
+        "Total years coding"
+        "Professional years coding"
+        "Country of residence"
+        "City of residence"
+        "Found out about the SSH server via"
+    )
 
     for prompt in "${prompts[@]}"; do
         count=0
@@ -49,8 +79,7 @@ main() {
                 clock=0
                 DoAction "$prompt" $Keys
             fi
-        done
-        
+        done        
     done
 
     stty sane
